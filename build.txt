@@ -1,0 +1,3 @@
+displayName = Meme Class Mod
+author = The Meme Classes Team
+version = 0.1
