@@ -39,5 +39,10 @@ namespace MemeClasses.Items.Pulleys
 		{
 			return slot == ModContent.GetInstance<PulleyAccSlot>().Type;
 		}
+
+		public override void UpdateEquip(Player player)
+		{
+			player.GetModPlayer<PulleyPlayer>().ActivePulley = Item;
+		}
 	}
 }

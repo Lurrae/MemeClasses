@@ -4,14 +4,23 @@ Mods:
 	{
 		ItemName:
 		{
+			# Accessories
 			FiberCordageUpgrade: "Guide to Advanced Rope Bindings"
-			PulleyItem: "Hellstone Pulley"
 			RopeGlove: "Rope Glove"
+			
+			# Tools
+			IceCoil: "Ice Coil"
 			RopeGun: "Rope Cannon"
+			
+			# Pullies
+			HellstonePulley: "Hellstone Pulley"
+			MechPulley: "Mechanical Pulley"
+			SlimePulley: "Slimy Pulley"
 		}
 		
 		ItemTooltip:
 		{
+			# Accessories
 			FiberCordageUpgrade:
 				'''
 				Allows the collection of Vine Rope from vines
@@ -19,14 +28,35 @@ Mods:
 				Increases rope placement range by 2
 				You attract dropped ropes from further away
 				'''
-			PulleyItem: "A pulley made out of Hellstone!"
 			RopeGlove:
 				'''
 				Increases pulley speed by 5%
 				Increases rope placement range by 1
 				You attract dropped ropes from further away
 				'''
+			
+			# Tools
+			IceCoil:
+				'''
+				Summons a magical ice rope at your cursor
+				Right-click to throw an icy rope coil for 10 Mana
+				The icy rope coil can be placed in midair
+				'''
 			RopeGun: "Fires Rope Coils at a much higher speed than normal"
+			
+			# Pullies
+			HellstonePulley: "A pulley made out of Hellstone!"
+			MechPulley:
+				'''
+				'Watch your hands!'
+				Builds up an electrical charge while moving on the pulley
+				When you dismount from a rope, the pulley releases up to 3 electrical bolts at nearby enemies
+				'''
+			SlimePulley:
+				'''
+				Provides knockback immunity while clinging to a rope
+				You travel much faster when moving down a rope and can damage enemies on collision
+				'''
 		}
 	}
 }

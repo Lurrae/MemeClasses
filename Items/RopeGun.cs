@@ -19,6 +19,7 @@ namespace MemeClasses.Items
 			Item.useTime = 20;
 			Item.useAnimation = 20;
 			Item.useStyle = ItemUseStyleID.Shoot;
+			Item.noMelee = true;
 			Item.shoot = ProjectileID.RopeCoil;
 			Item.shootSpeed = 20f;
 			Item.value = Item.sellPrice(silver: 20);
