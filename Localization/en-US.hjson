@@ -1,0 +1,15 @@
+Mods:
+{
+	MemeClasses:
+	{
+		ItemName:
+		{
+			PulleyItem: "Hellstone Pulley"
+		}
+		
+		ItemTooltip:
+		{
+			PulleyItem: "A pulley made out of Hellstone!"
+		}
+	}
+}
