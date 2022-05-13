@@ -1,6 +1,7 @@
 using MemeClasses.Items.Pulleys;
 using Microsoft.Xna.Framework;
 using Terraria;
+using Terraria.Audio;
 using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
@@ -42,7 +43,8 @@ namespace MemeClasses.Projectiles
 					Vector2 velocity = targetPos - Projectile.Center;
 					velocity.Normalize();
 
-					Projectile.NewProjectile(Projectile.GetSource_FromAI(), Projectile.Center, velocity * 5f, ProjectileType<HellstoneFlameShot>(), Projectile.damage, Projectile.knockBack, Projectile.owner);
+					SoundEngine.PlaySound(SoundID.Item42, Projectile.Center);
+					Projectile.NewProjectile(Projectile.GetSource_FromAI(), Projectile.Center, velocity * 12f, ProjectileType<HellstoneFlameShot>(), Projectile.damage, Projectile.knockBack, Projectile.owner);
 				}
 			}
 		}
@@ -74,7 +76,6 @@ namespace MemeClasses.Projectiles
 			Projectile.width = 6;
 			Projectile.height = 6;
 			Projectile.friendly = true;
-			Projectile.penetrate = -1;
 			Projectile.DamageType = GetInstance<PulleyDamageClass>();
 		}
 

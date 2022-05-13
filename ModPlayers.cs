@@ -67,6 +67,11 @@ namespace MemeClasses
 					{
 						SlimePulley_DownwardMovement();
 					}
+					else if (ActivePulley.type == ItemType<MechPulley>() && MechPulleyCharge >= 3f)
+					{
+						MechPulley_MaxCharge();
+					}
+
 					if (Player.velocity != Vector2.Zero)
 					{
 						timer++;
@@ -75,7 +80,7 @@ namespace MemeClasses
 						{
 							MechPulley_BuildUpCharge();
 						}
-						else if (ActivePulley.type == ItemType<HellstonePulley>() && timer == 10)
+						else if (ActivePulley.type == ItemType<HellstonePulley>() && timer >= 5)
 						{
 							HellstonePulley_LingeringFlames();
 							timer = 0;
@@ -125,50 +130,80 @@ namespace MemeClasses
 					soundsPlayed++;
 				}
 			}
-			else
+		}
+
+		private void MechPulley_MaxCharge()
+		{
+			float x = Main.rand.NextFloat(-0.2f, 0.2f);
+			float y = Main.rand.NextFloat(-0.2f, 0.2f);
+
+			Dust dust = Dust.NewDustDirect(Player.position, Player.width, Player.height, DustID.CosmicCarKeys, x, y);
+			dust.noGravity = true;
+
+			foreach (NPC npc in Main.npc)
 			{
-				MechPulley_SummonBolts();
+				// Only release charge if there's an enemy in range
+				if (npc.CanBeChasedBy() && Player.Distance(npc.Center) <= 512f)
+				{
+					MechPulley_SummonBolts();
+					break;
+				}
 			}
 		}
 
 		private readonly List<int> targets = new();
 		private void MechPulley_SummonBolts()
 		{
-			SoundEngine.PlaySound(SoundID.Item94, Player.Center);
+			int charge = (int)Math.Floor(MechPulleyCharge);
 			
-			int charge = (int)Math.Round(MechPulleyCharge);
-			foreach (NPC npc in Main.npc)
-			{
-				if (!npc.CanBeChasedBy() || Player.Distance(npc.Center) > 512f)
-				{
-					continue; // Skip any NPCs we can't target
-				}
-
-				targets.Add(npc.whoAmI);
-				if (targets.Count == 3)
-					break;
-			}
-
 			if (charge > 0)
 			{
+				SoundEngine.PlaySound(SoundID.Item94, Player.Center);
+
+				for (int n = 0; n < Main.maxNPCs; n++)
+				{
+					NPC npc = Main.npc[n];
+
+					if (!npc.CanBeChasedBy() || Player.Distance(npc.Center) > 512f)
+					{
+						continue; // Skip any NPCs we can't target
+					}
+
+					targets.Add(npc.whoAmI);
+					if (targets.Count == 3)
+						break;
+				}
+
 				for (int i = 0; i < charge; i++)
 				{
-					var source = Player.GetSource_ItemUse(ActivePulley);
-					float damage = ActivePulley.damage * MechPulleyCharge;
-					Projectile bolt = Projectile.NewProjectileDirect(source, Player.Center, Vector2.One * 5f, ProjectileID.MagnetSphereBolt, (int)damage, ActivePulley.knockBack, Player.whoAmI);
-					bolt.DamageType = GetInstance<PulleyDamageClass>();
-					
-					if (targets.Count > i)
+					var source = Player.GetSource_ItemUse(ActivePulley, "MechPulley_Bolt");
+					Vector2 newVel;
+
+					if (targets.Count > 0)
 					{
-						Vector2 targetPos = Main.npc[targets[i]].Center;
-						Vector2 newVel = targetPos - Player.Center;
+						Vector2 targetPos;
+
+						if (targets.Count < i + 1)
+						{
+							int j = Main.rand.Next(targets.Count);
+							targetPos = Main.npc[targets[j]].Center;
+						}
+						else
+						{
+							targetPos = Main.npc[targets[i]].Center;
+						}
+
+						newVel = targetPos - Player.Center;
 						newVel.Normalize();
-						bolt.velocity = newVel * 5f;
 					}
 					else
 					{
-						bolt.velocity = bolt.velocity.RotatedByRandom(MathHelper.ToRadians(360f));
+						newVel = Vector2.One.RotatedByRandom(MathHelper.ToRadians(360f));
 					}
+
+					Projectile bolt = Projectile.NewProjectileDirect(source, Player.Center, newVel * 5f, ProjectileID.MagnetSphereBolt, ActivePulley.damage, ActivePulley.knockBack, Player.whoAmI);
+					bolt.DamageType = GetInstance<PulleyDamageClass>();
+					bolt.maxPenetrate = bolt.penetrate = charge; // Hits one enemy per charge
 				}
 			}
 			MechPulleyCharge = 0f;
@@ -178,14 +213,8 @@ namespace MemeClasses
 
 		private void HellstonePulley_LingeringFlames()
 		{
-			int pulleyDir = Player.pulleyDir;
-			float gravDir = Player.gravDir;
-			int dir = Player.direction;
-
-			int num = (pulleyDir == 2) ? 0 : 10;
-			int num2 = (pulleyDir == 2) ? -25 : -26;
 			Vector2 vector = new(Player.width / 2, Player.height / 2);
-			Vector2 vector2 = new((int)(Player.position.X + vector.X - (9 * dir)) + num * dir, (int)(Player.position.Y + vector.Y + 2f * gravDir + num2 * gravDir));
+			Vector2 vector2 = new((int)(Player.position.X + vector.X - 9) + 10, (int)(Player.position.Y + vector.Y + 2f * Player.gravDir + -26 * Player.gravDir));
 
 			Projectile.NewProjectile(Player.GetSource_ItemUse(ActivePulley), vector2, Vector2.Zero, ProjectileType<HellstoneFlame>(), ActivePulley.damage, ActivePulley.knockBack, Player.whoAmI);
 		}
