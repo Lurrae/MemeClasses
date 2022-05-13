@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
 using Terraria;
+using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
@@ -37,6 +38,15 @@ namespace MemeClasses
 				{
 					item.tileBoost = 3 + BonusRopeRange; // We can't do += here because tileBoost does not reset every frame, so it would just increase infinitely
 				}
+			}
+		}
+
+		// Prevent the vanilla pulley sprite from drawing if a custom one needs to be drawn instead
+		public override void HideDrawLayers(PlayerDrawSet drawInfo)
+		{
+			if (Player.pulley && ActivePulley != null && !GetInstance<PulleyAccSlot>().HideVisuals)
+			{
+				PlayerDrawLayers.Pulley.Hide();
 			}
 		}
 
@@ -122,7 +132,7 @@ namespace MemeClasses
 					Projectile bolt = Projectile.NewProjectileDirect(source, Player.Center, Vector2.One * 5f, ProjectileID.MagnetSphereBolt, (int)damage, ActivePulley.knockBack, Player.whoAmI);
 					bolt.DamageType = GetInstance<PulleyDamageClass>();
 					
-					if (targets.Count >= i)
+					if (targets.Count > 0 && targets.Count >= i)
 					{
 						Vector2 targetPos = Main.npc[targets[i]].Center;
 						Vector2 newVel = targetPos - Player.Center;
