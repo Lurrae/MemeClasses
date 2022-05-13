@@ -1,5 +1,5 @@
 using Terraria;
-using Terraria.GameContent.Creative;
+using Terraria.ID;
 using Terraria.ModLoader;
 
 namespace MemeClasses.Items.Pulleys
@@ -14,6 +14,8 @@ namespace MemeClasses.Items.Pulleys
 		{
 			Item.damage = 18;
 			Item.knockBack = 8f;
+			Item.rare = ItemRarityID.Green;
+			Item.value = Item.sellPrice(gold: 4);
 		}
 	}
 }

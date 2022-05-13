@@ -16,6 +16,8 @@ namespace MemeClasses.Items.Accessories
 		public override void SetDefaults()
 		{
 			Item.accessory = true;
+			Item.rare = ItemRarityID.Green;
+			Item.value = Item.sellPrice(silver: 10);
 		}
 
 		public override void UpdateEquip(Player player)
