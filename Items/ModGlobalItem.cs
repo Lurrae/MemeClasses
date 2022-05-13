@@ -20,11 +20,11 @@ namespace MemeClasses.Items
 		{
 			if (MemeClasses.ItemIsRope(item, "rope") && player.GetModPlayer<PulleyPlayer>().RopeGlove)
 			{
-				grabRange += 32;
+				grabRange += 64;
 			}
 			if (MemeClasses.ItemIsRope(item, "rope") && player.GetModPlayer<PulleyPlayer>().RopeGlove2)
 			{
-				grabRange += 64;
+				grabRange += 96;
 			}
 		}
 

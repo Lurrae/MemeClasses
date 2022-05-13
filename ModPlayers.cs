@@ -1,8 +1,10 @@
 using MemeClasses.Items.Pulleys;
+using MemeClasses.Projectiles;
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
 using Terraria;
+using Terraria.Audio;
 using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.Localization;
@@ -50,6 +52,7 @@ namespace MemeClasses
 			}
 		}
 
+		private int timer = 0;
 		public override void PostUpdateMiscEffects()
 		{
 			if (Player.pulley)
@@ -64,9 +67,19 @@ namespace MemeClasses
 					{
 						SlimePulley_DownwardMovement();
 					}
-					else if (ActivePulley.type == ItemType<MechPulley>() && Player.velocity != Vector2.Zero)
+					if (Player.velocity != Vector2.Zero)
 					{
-						MechPulley_BuildUpCharge();
+						timer++;
+
+						if (ActivePulley.type == ItemType<MechPulley>())
+						{
+							MechPulley_BuildUpCharge();
+						}
+						else if (ActivePulley.type == ItemType<HellstonePulley>() && timer == 10)
+						{
+							HellstonePulley_LingeringFlames();
+							timer = 0;
+						}
 					}
 				}
 			}
@@ -94,22 +107,35 @@ namespace MemeClasses
 			}
 		}
 
+		private int soundsPlayed = 0;
 		private void MechPulley_BuildUpCharge()
 		{
 			if (MechPulleyCharge < 3f)
 			{
-				MechPulleyCharge += 0.01f;
-				if (MechPulleyCharge == 1f || MechPulleyCharge == 2f || MechPulleyCharge == 3f)
+				MechPulleyCharge += 0.01f * (Player.position.Distance(Player.oldPosition) / 4);
+				MechPulleyCharge = (float)Math.Round(MechPulleyCharge, 2);
+
+				if ((MechPulleyCharge >= 1f && soundsPlayed < 1) || (MechPulleyCharge >= 2f && soundsPlayed < 2) || (MechPulleyCharge >= 3f && soundsPlayed < 3))
 				{
-					Main.NewText("Reached charge level " + (int)MechPulleyCharge + "!");
+					SoundEngine.PlaySound(SoundID.MaxMana, Player.Center);
+					for (int i = 0; i < 10; i++)
+					{
+						Dust.NewDust(Player.position, Player.width, Player.height, DustID.Electric, Main.rand.Next(-5, 5), Main.rand.Next(-5, -3));
+					}
+					soundsPlayed++;
 				}
+			}
+			else
+			{
+				MechPulley_SummonBolts();
 			}
 		}
 
 		private readonly List<int> targets = new();
-
 		private void MechPulley_SummonBolts()
 		{
+			SoundEngine.PlaySound(SoundID.Item94, Player.Center);
+			
 			int charge = (int)Math.Round(MechPulleyCharge);
 			foreach (NPC npc in Main.npc)
 			{
@@ -132,7 +158,7 @@ namespace MemeClasses
 					Projectile bolt = Projectile.NewProjectileDirect(source, Player.Center, Vector2.One * 5f, ProjectileID.MagnetSphereBolt, (int)damage, ActivePulley.knockBack, Player.whoAmI);
 					bolt.DamageType = GetInstance<PulleyDamageClass>();
 					
-					if (targets.Count > 0 && targets.Count >= i)
+					if (targets.Count > i)
 					{
 						Vector2 targetPos = Main.npc[targets[i]].Center;
 						Vector2 newVel = targetPos - Player.Center;
@@ -146,7 +172,22 @@ namespace MemeClasses
 				}
 			}
 			MechPulleyCharge = 0f;
+			soundsPlayed = 0;
 			targets.Clear();
+		}
+
+		private void HellstonePulley_LingeringFlames()
+		{
+			int pulleyDir = Player.pulleyDir;
+			float gravDir = Player.gravDir;
+			int dir = Player.direction;
+
+			int num = (pulleyDir == 2) ? 0 : 10;
+			int num2 = (pulleyDir == 2) ? -25 : -26;
+			Vector2 vector = new(Player.width / 2, Player.height / 2);
+			Vector2 vector2 = new((int)(Player.position.X + vector.X - (9 * dir)) + num * dir, (int)(Player.position.Y + vector.Y + 2f * gravDir + num2 * gravDir));
+
+			Projectile.NewProjectile(Player.GetSource_ItemUse(ActivePulley), vector2, Vector2.Zero, ProjectileType<HellstoneFlame>(), ActivePulley.damage, ActivePulley.knockBack, Player.whoAmI);
 		}
 	}
 }
