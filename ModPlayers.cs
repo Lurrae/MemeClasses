@@ -94,9 +94,12 @@ namespace MemeClasses
 					}
 				}
 			}
-			else if (JustLeftRope && ActivePulley.type == ItemType<MechPulley>())
+			else if (ActivePulley != null)
 			{
-				MechPulley_SummonBolts();
+				if (JustLeftRope && ActivePulley.type == ItemType<MechPulley>())
+				{
+					MechPulley_SummonBolts();
+				}
 			}
 
 			JustLeftRope = Player.pulley;

@@ -102,14 +102,15 @@ namespace MemeClasses.Projectiles
 							}
 						}
 
-						// Prevent player from moving normally and store their previous position to determine "velocity"
+						// Prevent player from moving normally and store their previous position to determine "velocity" later
 						player.position -= player.velocity;
 						player.oldPosition = player.position;
-
-						PlayerGrabbed = true;
-						player.pulley = true;
 						player.velocity = Vector2.Zero;
 						player.wingFrame = 0;
+
+						// Set some visual stuff
+						PlayerGrabbed = true;
+						player.pulley = true;
 						player.pulleyDir = 2;
 						player.bodyFrame.Y = player.bodyFrame.Height;
 						player.legFrameCounter = 0.0; // Lock the player's leg animation to a singular frame (this should stop them from "walking" on air)
@@ -118,8 +119,13 @@ namespace MemeClasses.Projectiles
 						Vector2 distToProj = other.Center - Projectile.Center;
 						distToProj.Normalize();
 
+						bool closeX = Math.Abs(Projectile.Center.X - other.Center.X) < 64f;
+						bool closeY = Math.Abs(Projectile.Center.Y - other.Center.Y) < 64f;
+						bool farX = Math.Abs(Projectile.Center.X - other.Center.X) > 64f;
+						bool farY = Math.Abs(Projectile.Center.Y - other.Center.Y) > 64f;
+
 						// Handle player movement left/right
-						if ((player.controlLeft || player.controlRight) && Math.Abs(Projectile.Center.X - other.Center.X) > 96f)
+						if ((player.controlLeft || player.controlRight) && (farX || closeY))
 						{
 							#region Lots of Variables
 							bool flag = player.controlRight && player.Right.Distance(Projectile.Left) > 40f;
@@ -146,11 +152,17 @@ namespace MemeClasses.Projectiles
 							}
 						}
 						// Handle player movement up/down
-						else if ((player.controlUp || player.controlDown) && Math.Abs(Projectile.Center.Y - other.Center.Y) > 96f)
+						else if ((player.controlUp || player.controlDown) && (farY || closeX))
 						{
-							#region Lots of Variables
-							float SlimyPulleyMod = player.controlDown && pPlr.ActivePulley.type == ItemType<SlimePulley>() ? 1.2f : 1f;
-							float SlimyPulleyMod2 = player.controlDown && pPlr.ActivePulley.type == ItemType<SlimePulley>() ? 2f : 1f;
+							#region Lots More Variables
+							float SlimyPulleyMod = 1f;
+							float SlimyPulleyMod2 = 1f;
+							if (pPlr.ActivePulley != null)
+							{
+								SlimyPulleyMod = player.controlDown && pPlr.ActivePulley.type == ItemType<SlimePulley>() ? 1.2f : 1f;
+								SlimyPulleyMod2 = player.controlDown && pPlr.ActivePulley.type == ItemType<SlimePulley>() ? 2f : 1f;
+							}
+							
 							bool flag = player.controlUp && player.Top.Distance(other.Bottom) > 16f;
 							bool flag2 = player.controlDown && player.Bottom.Distance(Projectile.Top) > 8f * SlimyPulleyMod2;
 							bool flag3 = player.controlUp && player.Top.Distance(Projectile.Bottom) > 16f;
@@ -229,7 +241,7 @@ namespace MemeClasses.Projectiles
 					{
 						if (distance < 12f || float.IsNaN(distance)) // If we're close enough, we can break out of this loop
 							break;
-						
+
 						distToProj.Normalize();
 						distToProj *= 8f;
 						center += distToProj;
@@ -242,6 +254,7 @@ namespace MemeClasses.Projectiles
 					// We also need to draw the left one so the rope draws behind it
 					// Aiui the DrawBehind() function has to either affect all projectiles of a given type, or none at all, so we can't use that
 					tex = Request<Texture2D>(Texture).Value;
+					drawColor = other.GetAlpha(lightColor);
 					Main.EntitySpriteDraw(tex, other.Center - Main.screenPosition, null, drawColor, other.rotation, tex.Size() * 0.5f, 1f, SpriteEffects.None, 0);
 				}
 			}
