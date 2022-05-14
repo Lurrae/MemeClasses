@@ -22,6 +22,7 @@ namespace MemeClasses
 		public Item ActivePulley; // What pulley item is in the player's pulley slot?
 		public float MechPulleyCharge;
 		public bool JustLeftRope;
+		public bool MovementOverride;
 
 		public override void ResetEffects()
 		{
@@ -72,7 +73,7 @@ namespace MemeClasses
 						MechPulley_MaxCharge();
 					}
 
-					if (Player.velocity != Vector2.Zero)
+					if (Player.velocity != Vector2.Zero || MovementOverride)
 					{
 						timer++;
 
@@ -85,6 +86,11 @@ namespace MemeClasses
 							HellstonePulley_LingeringFlames();
 							timer = 0;
 						}
+					}
+
+					if (ActivePulley.type != ItemType<MechPulley>() && MechPulleyCharge >= 1f)
+					{
+						MechPulley_SummonBolts();
 					}
 				}
 			}

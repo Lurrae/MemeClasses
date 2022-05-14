@@ -1,1 +1,4 @@
-Meme Class Mod is a pretty cool mod, it does...this. Modify this file with a description of your mod.
+Adds a variety of new classes to Terraria! They might not be balanced or even entirely viable, but at least they're there!
+
+Currently-implemented classes:
+Pulley Class - A class based entirely around climbing ropes. While climbing on a rope with a special pulley equipped in your pulley slot, you will unleash special attacks!

@@ -11,6 +11,7 @@ Mods:
 			# Tools
 			IceCoil: "Ice Coil"
 			RopeGun: "Rope Cannon"
+			ZiplineShooter: "Zipline Gun [ PROTOTYPE ]"
 			
 			# Pullies
 			HellstonePulley: "Hellstone Pulley"
@@ -43,6 +44,12 @@ Mods:
 				The icy rope coil can be placed in midair
 				'''
 			RopeGun: "Fires Rope Coils at a much higher speed than normal"
+			ZiplineShooter:
+				'''
+				[ PROTOTYPE - This item may not behave as intended and uses placeholder graphics! ]
+				Left-click and right-click each place a tether
+				When two tethers are active at the same time, they connect together and can support pullies!
+				'''
 			
 			# Pullies
 			HellstonePulley: "A pulley made out of Hellstone!"
