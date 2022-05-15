@@ -33,6 +33,7 @@ namespace MemeClasses.Projectiles
 			if (IsRight)
 			{
 				Player player = Main.player[Projectile.owner];
+				PulleyPlayer pPlr = player.GetModPlayer<PulleyPlayer>();
 
 				Projectile other = null;
 				for (int p = 0; p < Main.maxProjectiles; p++)
@@ -45,7 +46,7 @@ namespace MemeClasses.Projectiles
 					}
 				}
 
-				if (other != null && Projectile.Distance(other.Center) < 1024f)
+				if (other != null && Projectile.Distance(other.Center) < 2048f)
 				{
 					Vector2 vect = player.Size + new Vector2(0, 32);
 					Vector2 vect2 = player.position - new Vector2(0, 32);
@@ -53,6 +54,7 @@ namespace MemeClasses.Projectiles
 					if (player.controlJump || player.mount.Active || !Collision.CheckAABBvLineCollision(vect2, vect, Projectile.Center, other.Center))
 					{
 						PlayerGrabbed = false;
+						pPlr.MovingOnZipline = false;
 						return;
 					}
 
@@ -74,6 +76,7 @@ namespace MemeClasses.Projectiles
 							player.frozen || player.stoned || player.webbed)
 						{
 							PlayerGrabbed = false;
+							pPlr.MovingOnZipline = false;
 							return;
 						}
 
@@ -115,7 +118,6 @@ namespace MemeClasses.Projectiles
 						player.bodyFrame.Y = player.bodyFrame.Height;
 						player.legFrameCounter = 0.0; // Lock the player's leg animation to a singular frame (this should stop them from "walking" on air)
 
-						PulleyPlayer pPlr = player.GetModPlayer<PulleyPlayer>();
 						Vector2 distToProj = other.Center - Projectile.Center;
 						distToProj.Normalize();
 
@@ -188,7 +190,7 @@ namespace MemeClasses.Projectiles
 
 						if (player.position != player.oldPosition)
 						{
-							pPlr.MovementOverride = true; // Triggers movement-based pulley effects
+							pPlr.MovingOnZipline = true; // Triggers movement-based pulley effects
 
 							float velocity = (float)player.position.Distance(player.oldPosition);
 							player.legFrame.Y = player.legFrame.Height * 5; // Animate the player's legs
@@ -205,7 +207,7 @@ namespace MemeClasses.Projectiles
 						}
 						else
 						{
-							pPlr.MovementOverride = false;
+							pPlr.MovingOnZipline = false;
 						}
 					}
 				}
@@ -227,7 +229,7 @@ namespace MemeClasses.Projectiles
 					}
 				}
 
-				if (other != null && Projectile.Distance(other.Center) < 1024f) // Other tether has to be on-screen for them to connect
+				if (other != null && Projectile.Distance(other.Center) < 2048f) // Other tether has to be on-screen for them to connect
 				{
 					Texture2D tex = Request<Texture2D>(Texture + "_Tether").Value;
 					Vector2 targetPos = other.Center;

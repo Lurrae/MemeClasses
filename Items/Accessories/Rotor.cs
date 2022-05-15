@@ -1,12 +1,12 @@
 using Terraria;
-using Terraria.ID;
 using Terraria.GameContent.Creative;
+using Terraria.ID;
 using Terraria.ModLoader;
+using static Terraria.ModLoader.ModContent;
 
 namespace MemeClasses.Items.Accessories
 {
-	[AutoloadEquip(EquipType.HandsOn)]
-	public class RopeGlove : ModItem
+	public class Rotor : ModItem
 	{
 		public override void SetStaticDefaults()
 		{
@@ -16,24 +16,22 @@ namespace MemeClasses.Items.Accessories
 		public override void SetDefaults()
 		{
 			Item.accessory = true;
-			Item.rare = ItemRarityID.Blue;
-			Item.value = Item.sellPrice(silver: 2);
+			Item.rare = ItemRarityID.LightRed;
+			Item.value = Item.sellPrice(gold: 1, silver: 50);
 		}
 
 		public override void UpdateEquip(Player player)
 		{
 			PulleyPlayer pPlr = player.GetModPlayer<PulleyPlayer>();
 
-			pPlr.PulleySpeed += 0.05f; // +5% pulley speed
-			pPlr.BonusRopeRange += 1; // +1 rope placement range
-			pPlr.RopeGlove = true; // Increased rope grab range
+			pPlr.Rotor = true;
 		}
 
 		public override void AddRecipes()
 		{
 			CreateRecipe()
-				.AddRecipeGroup("MemeClasses:Ropes", 25)
-				.AddTile(TileID.Loom)
+				.AddIngredient(ItemID.HallowedBar, 10)
+				.AddTile(TileID.MythrilAnvil)
 				.Register();
 		}
 	}

@@ -1,4 +1,5 @@
 using MemeClasses.Items.Pulleys;
+using MemeClasses.Items.Accessories;
 using Terraria;
 using Terraria.ID;
 using Terraria.GameContent.ItemDropRules;
@@ -13,7 +14,12 @@ namespace MemeClasses
 		{
 			if (npc.type == NPCID.KingSlime)
 			{
-				npcLoot.Add(ItemDropRule.ByCondition(new Conditions.NotExpert(), ItemType<SlimePulley>(), 10)); // 10% (1/10) drop chance
+				npcLoot.Add(ItemDropRule.ByCondition(new Conditions.NotExpert(), ItemType<SlimePulley>(), 10)); // 1/10 drop chance
+			}
+
+			if (npc.type == NPCID.TheGroom)
+			{
+				npcLoot.Add(ItemDropRule.Common(ItemType<FancyPulley>())); // Guaranteed drop since The Groom is pretty rare
 			}
 		}
 
@@ -22,6 +28,15 @@ namespace MemeClasses
 			if (type == NPCID.Mechanic)
 			{
 				shop.item[nextSlot].SetDefaults(ItemType<MechPulley>());
+				nextSlot++;
+			}
+		}
+
+		public override void SetupTravelShop(int[] shop, ref int nextSlot)
+		{
+			if (Main.rand.NextBool(7))
+			{
+				shop[nextSlot] = ItemType<RopeOil>();
 				nextSlot++;
 			}
 		}
