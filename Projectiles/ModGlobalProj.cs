@@ -1,5 +1,6 @@
 using MemeClasses.Items.Pulleys;
 using Microsoft.Xna.Framework;
+using System;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
@@ -14,6 +15,7 @@ namespace MemeClasses.Projectiles
 		public override bool InstancePerEntity => true;
 
 		private bool ChainLightning = false;
+		private bool MovingSpore = false;
 
 		// Make lightning bolts spawned by the Mechanical Pulley "bounce" to nearby enemies
 		public override void OnSpawn(Projectile projectile, IEntitySource source)
@@ -23,6 +25,22 @@ namespace MemeClasses.Projectiles
 				ChainLightning = true;
 				projectile.usesLocalNPCImmunity = true;
 				projectile.localNPCHitCooldown = -1;
+			}
+
+			if (projectile.type == ProjectileID.TruffleSpore && source is EntitySource_ItemUse { Context: "ShroomPulley_Spore" })
+			{
+				MovingSpore = true;
+			}
+		}
+
+		public override void AI(Projectile projectile)
+		{
+			if (projectile.type == ProjectileID.TruffleSpore && MovingSpore)
+			{
+				NPC npc = projectile.FindTargetWithinRange(512, true);
+
+				if (npc != null)
+					projectile.position = projectile.position.MoveTowards(npc.Center, 0.5f);
 			}
 		}
 
@@ -46,6 +64,7 @@ namespace MemeClasses.Projectiles
 					newVel.Normalize();
 
 					projectile.velocity = newVel * 5f;
+					projectile.damage = (int)Math.Round(projectile.damage * 0.9f);
 					break; // Only bounce to one extra enemy at a time
 				}
 			}

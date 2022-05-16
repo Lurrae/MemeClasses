@@ -135,7 +135,7 @@ namespace MemeClasses
 						{
 							MechPulley_BuildUpCharge();
 						}
-						else if (ActivePulley.type == ItemType<HellstonePulley>() && moveTimer >= Math.Max(8 - (2 * PulleySpeed), 3))
+						else if (ActivePulley.type == ItemType<HellstonePulley>() && moveTimer >= Math.Max(16 - (2 * PulleySpeed), 3))
 						{
 							HellstonePulley_LingeringFlames();
 							moveTimer = 0;
@@ -277,6 +277,7 @@ namespace MemeClasses
 					Projectile bolt = Projectile.NewProjectileDirect(source, Player.Center, newVel * 5f, ProjectileID.MagnetSphereBolt, ActivePulley.damage, ActivePulley.knockBack, Player.whoAmI);
 					bolt.DamageType = GetInstance<PulleyDamageClass>();
 					bolt.maxPenetrate = bolt.penetrate = charge; // Hits one enemy per charge
+					bolt.ArmorPenetration = 10; // Ignores 10 enemy defense
 				}
 			}
 			if (Rotor && charge > 1)
@@ -302,8 +303,10 @@ namespace MemeClasses
 
 		private void WoodPulley_Projectiles()
 		{
-			Vector2 velocity = Vector2.One;
-			velocity = velocity.RotatedByRandom(MathHelper.ToRadians(360f));
+			Vector2 velocity = Vector2.UnitY;
+			velocity = velocity.RotatedByRandom(MathHelper.ToRadians(45f));
+			if (Player.velocity.Y < 0)
+				velocity.Y *= 3f;
 
 			int type;
 			int damageMod;
@@ -312,13 +315,13 @@ namespace MemeClasses
 			{
 				type = ProjectileType<Splinter>();
 				damageMod = 2;
-				veloMod = 6f;
+				veloMod = -4f;
 			}
 			else // 4/5 chance to shoot a rope shred
 			{
 				type = ProjectileType<RopeShred>();
 				damageMod = 1;
-				veloMod = 2f;
+				veloMod = -2f;
 			}
 
 			Projectile proj = Projectile.NewProjectileDirect(Player.GetSource_ItemUse(ActivePulley), Player.Center, velocity * veloMod, type, ActivePulley.damage * damageMod, ActivePulley.knockBack * damageMod, Player.whoAmI);
@@ -334,7 +337,7 @@ namespace MemeClasses
 			if (Player.velocity.Y < 0)
 				velocity.Y *= 5f;
 
-			Projectile proj = Projectile.NewProjectileDirect(Player.GetSource_ItemUse(ActivePulley), Player.Center, velocity * -4f, ProjectileType<BloodGlob>(), ActivePulley.damage, ActivePulley.knockBack, Player.whoAmI);
+			Projectile proj = Projectile.NewProjectileDirect(Player.GetSource_ItemUse(ActivePulley), Player.Center, velocity * -4f, ProjectileType<BloodGlob>(), ActivePulley.damage, ActivePulley.knockBack, Player.whoAmI, 3);
 			proj.DamageType = GetInstance<PulleyDamageClass>();
 		}
 
@@ -348,7 +351,7 @@ namespace MemeClasses
 			float range = 198 * PulleySpeed;
 			Vector2 spawnPos = Player.Center + Main.rand.NextVector2Circular(range, range);
 
-			Projectile.NewProjectile(Player.GetSource_ItemUse(ActivePulley), spawnPos, Vector2.Zero, ProjectileID.TruffleSpore, ActivePulley.damage, ActivePulley.knockBack, Player.whoAmI);
+			Projectile.NewProjectile(Player.GetSource_ItemUse(ActivePulley, "ShroomPulley_Spore"), spawnPos, Vector2.Zero, ProjectileID.TruffleSpore, ActivePulley.damage, ActivePulley.knockBack, Player.whoAmI);
 		}
 	}
 }

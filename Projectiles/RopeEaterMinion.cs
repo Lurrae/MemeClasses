@@ -28,6 +28,7 @@ namespace MemeClasses.Projectiles
 			Projectile.friendly = true;
 			Projectile.usesLocalNPCImmunity = true;
 			Projectile.localNPCHitCooldown = 10;
+			Projectile.penetrate = -1;
 		}
 
 		float timer = 1;
@@ -76,11 +77,11 @@ namespace MemeClasses.Projectiles
 
 				if (first)
 				{
-					targ = targ.RotatedBy(MathHelper.ToRadians(-15));
+					targ = targ.RotatedBy(MathHelper.ToRadians(-5));
 				}
 				else
 				{
-					targ = targ.RotatedBy(MathHelper.ToRadians(15));
+					targ = targ.RotatedBy(MathHelper.ToRadians(5));
 				}
 
 				Projectile.ai[0] = targ.X;
@@ -150,8 +151,8 @@ namespace MemeClasses.Projectiles
 				float projRotation = distToProj.ToRotation() - MathHelper.PiOver2;
 				float distance = distToProj.Length();
 				Color drawColor = Projectile.GetAlpha(lightColor);
-
-				while (true) // Continue doing this forever until we break the loop
+				
+				for (int i = 0; i < 1000; i++) // Continue doing this effectively forever until we break the loop (but not ACTUALLY forever in case the loop were to somehow not terminate)
 				{
 					if (distance < 32f || float.IsNaN(distance)) // If we're close enough, we can break out of this loop
 						break;

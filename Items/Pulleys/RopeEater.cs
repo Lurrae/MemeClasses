@@ -11,7 +11,7 @@ namespace MemeClasses.Items.Pulleys
 
 		public override void SetPulleyDefaults()
 		{
-			Item.damage = 20;
+			Item.damage = 10;
 			Item.knockBack = 1f;
 			Item.rare = ItemRarityID.Green;
 			Item.value = Item.sellPrice(gold: 1);

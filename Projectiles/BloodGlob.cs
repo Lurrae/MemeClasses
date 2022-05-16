@@ -18,18 +18,18 @@ namespace MemeClasses.Projectiles
 			Projectile.height = 16;
 			Projectile.friendly = true;
 			Projectile.DamageType = GetInstance<PulleyDamageClass>();
-			Projectile.penetrate = 5;
+			Projectile.penetrate = 2;
 		}
 
 		public override void AI()
 		{
 			Projectile.rotation++;
 			Projectile.velocity.Y++;
-		}
 
-		public override void OnHitNPC(NPC target, int damage, float knockback, bool crit)
-		{
-			Projectile.penetrate++; // Don't lower pierce when hitting an enemy
+			if (Projectile.ai[0] == 0)
+			{
+				Projectile.Kill();
+			}
 		}
 
 		public override bool OnTileCollide(Vector2 oldVelocity)
@@ -47,7 +47,7 @@ namespace MemeClasses.Projectiles
 			}
 
 			SoundEngine.PlaySound(SoundID.Splash, Projectile.Center);
-			Projectile.penetrate--; // Lower pierce when hitting a tile, that way it'll die after bouncing five times
+			Projectile.ai[0]--; // Projectile can only bounce a few times
 			return false;
 		}
 

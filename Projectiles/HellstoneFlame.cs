@@ -41,7 +41,7 @@ namespace MemeClasses.Projectiles
 
 				if (ShotCooldown == 0)
 				{
-					ShotCooldown = (int)Math.Max(30, 62 - (2 * pPlr.PulleySpeed));
+					ShotCooldown = (int)Math.Max(30, 90 - (2 * pPlr.PulleySpeed));
 					Vector2 targetPos = target.Center;
 					Vector2 velocity = targetPos - Projectile.Center;
 					velocity.Normalize();

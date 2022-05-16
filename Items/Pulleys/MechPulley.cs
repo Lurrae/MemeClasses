@@ -12,7 +12,7 @@ namespace MemeClasses.Items.Pulleys
 
 		public override void SetPulleyDefaults()
 		{
-			Item.damage = 18;
+			Item.damage = 25;
 			Item.knockBack = 8f;
 			Item.rare = ItemRarityID.Green;
 			Item.value = Item.sellPrice(gold: 4);
