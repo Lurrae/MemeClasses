@@ -18,7 +18,7 @@ namespace MemeClasses.Projectiles
 			Projectile.height = 16;
 			Projectile.friendly = true;
 			Projectile.DamageType = GetInstance<PulleyDamageClass>();
-			Projectile.penetrate = 2;
+			Projectile.penetrate = 6;
 		}
 
 		public override void AI()
