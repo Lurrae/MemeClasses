@@ -24,7 +24,7 @@ namespace MemeClasses.Projectiles
 		public override void AI()
 		{
 			Projectile.rotation++;
-			Projectile.velocity.Y++;
+			Projectile.velocity.Y += 0.5f;
 
 			if (Projectile.ai[0] == 0)
 			{

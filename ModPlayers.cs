@@ -306,25 +306,26 @@ namespace MemeClasses
 			Vector2 velocity = Vector2.UnitY;
 			velocity = velocity.RotatedByRandom(MathHelper.ToRadians(45f));
 			if (Player.velocity.Y < 0)
-				velocity.Y *= 3f;
+				velocity.Y *= 6f;
 
 			int type;
 			int damageMod;
-			float veloMod;
-			if (Main.rand.NextBool(5)) // 1/5 chance to shoot a splinter
+			if (Main.rand.NextBool(3)) // 1/3 chance to shoot a splinter
 			{
 				type = ProjectileType<Splinter>();
 				damageMod = 2;
-				veloMod = -4f;
+				velocity.X *= 8;
+				velocity.Y *= -4; // Multiply by a negative number to make it shoot upwards
 			}
-			else // 4/5 chance to shoot a rope shred
+			else // 2/3 chance to shoot a rope shred
 			{
 				type = ProjectileType<RopeShred>();
 				damageMod = 1;
-				veloMod = -2f;
+				velocity.X *= 4;
+				velocity.Y *= -3;
 			}
 
-			Projectile proj = Projectile.NewProjectileDirect(Player.GetSource_ItemUse(ActivePulley), Player.Center, velocity * veloMod, type, ActivePulley.damage * damageMod, ActivePulley.knockBack * damageMod, Player.whoAmI);
+			Projectile proj = Projectile.NewProjectileDirect(Player.GetSource_ItemUse(ActivePulley), Player.Center, velocity, type, ActivePulley.damage * damageMod, ActivePulley.knockBack * damageMod, Player.whoAmI);
 			proj.friendly = true;
 			proj.hostile = false;
 			proj.DamageType = GetInstance<PulleyDamageClass>();
@@ -337,7 +338,7 @@ namespace MemeClasses
 			if (Player.velocity.Y < 0)
 				velocity.Y *= 5f;
 
-			Projectile proj = Projectile.NewProjectileDirect(Player.GetSource_ItemUse(ActivePulley), Player.Center, velocity * -4f, ProjectileType<BloodGlob>(), ActivePulley.damage, ActivePulley.knockBack, Player.whoAmI, 3);
+			Projectile proj = Projectile.NewProjectileDirect(Player.GetSource_ItemUse(ActivePulley), Player.Center, velocity * -3.5f, ProjectileType<BloodGlob>(), ActivePulley.damage, ActivePulley.knockBack, Player.whoAmI, 3);
 			proj.DamageType = GetInstance<PulleyDamageClass>();
 		}
 
