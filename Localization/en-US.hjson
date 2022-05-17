@@ -6,16 +6,24 @@ Mods:
 		{
 			# Accessories
 			FiberCordageUpgrade: "Guide to Advanced Rope Bindings"
+			FrayedBand: "Frayed Band"
 			RopeGlove: "Rope Glove"
+			RopeOil: "Rope Oil"
+			Rotor: "Mechanical Rotor"
 			
 			# Tools
 			IceCoil: "Ice Coil"
 			RopeGun: "Rope Cannon"
+			ZiplineShooter: "Zipline Gun [ PROTOTYPE ]"
 			
 			# Pullies
+			FancyPulley: "Fancy Pulley"
 			HellstonePulley: "Hellstone Pulley"
 			MechPulley: "Mechanical Pulley"
+			RopeEater: "Rope Eater's Maw"
+			ShroomPulley: "Shroom Pulley"
 			SlimePulley: "Slimy Pulley"
+			WoodenPulley: "Hand-Crafted Pulley"
 		}
 		
 		ItemTooltip:
@@ -28,11 +36,23 @@ Mods:
 				Increases rope placement range by 2
 				You attract dropped ropes from further away
 				'''
+			FrayedBand:
+				'''
+				Increases pulley damage by a flat 2
+				Increases pulley critical strike chance by 2%
+				'''
 			RopeGlove:
 				'''
 				Increases pulley speed by 5%
 				Increases rope placement range by 1
 				You attract dropped ropes from further away
+				'''
+			RopeOil: "Increases pulley speed by 10%"
+			Rotor:
+				'''
+				'You spin me right 'round'
+				When using a charged pulley's attack, the charge resets to 1 instead of 0
+				This effect does not trigger if the pulley only had 1 level of charge
 				'''
 			
 			# Tools
@@ -43,19 +63,53 @@ Mods:
 				The icy rope coil can be placed in midair
 				'''
 			RopeGun: "Fires Rope Coils at a much higher speed than normal"
+			ZiplineShooter:
+				'''
+				[ PROTOTYPE - This item may not behave as intended and uses placeholder graphics! ]
+				Left-click and right-click each place a tether
+				When two tethers are active at the same time, they connect together and can support pullies!
+				'''
 			
 			# Pullies
-			HellstonePulley: "A pulley made out of Hellstone!"
+			FancyPulley:
+				'''
+				Releases bouncing globs of blood while moving on the pulley
+				More blood is fired the faster you're moving
+				'''
+			HellstonePulley:
+				'''
+				Lights ropes on fire while moving on the pulley
+				The flames spit fireballs at nearby enemies, with the fire rate increasing with pulley speed
+				'''
 			MechPulley:
 				'''
 				'Watch your hands!'
 				Builds up an electrical charge while moving on the pulley
 				When you dismount from a rope, the pulley releases up to 3 electrical bolts at nearby enemies
 				'''
+			RopeEater:
+				'''
+				'Not to be confused with a Man Eater's maw'
+				Summons two plants tethered to the pulley that munch on nearby enemies
+				The plants' range increases with pulley speed
+				'''
+			ShroomPulley:
+				'''
+				Summons spores around you while on the pulley
+				The spores will linger around until they hit an enemy or enough time has passed
+				'''
 			SlimePulley:
 				'''
 				Provides knockback immunity while clinging to a rope
 				You travel much faster when moving down a rope and can damage enemies on collision
+				Deals more damage the faster you're moving
+				'''
+			WoodenPulley:
+				'''
+				'Might not be the most practical...'
+				Releases shreds of rope while moving on the pulley
+				Sometimes releases a splinter that does more damage and moves quicker
+				Projectiles are spawned faster when moving faster
 				'''
 		}
 	}

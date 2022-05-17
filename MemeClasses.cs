@@ -30,6 +30,26 @@ namespace MemeClasses
 			RecipeGroup.RegisterGroup("MemeClasses:RopeCoils", group);
 		}
 
+		// Adding some recipes that should have been in vanilla Terraria
+		public override void AddRecipes()
+		{
+			CreateRecipe(ItemID.Rope, 10)
+				.AddIngredient(ItemID.RopeCoil)
+				.Register();
+
+			CreateRecipe(ItemID.SilkRope, 10)
+				.AddIngredient(ItemID.SilkRopeCoil)
+				.Register();
+
+			CreateRecipe(ItemID.VineRope, 10)
+				.AddIngredient(ItemID.VineRopeCoil)
+				.Register();
+
+			CreateRecipe(ItemID.WebRope, 10)
+				.AddIngredient(ItemID.WebRopeCoil)
+				.Register();
+		}
+
 		public static bool ItemIsRope(Item item, string type)
 		{
 			return (type == "coil" && (item.type == ItemID.RopeCoil || item.type == ItemID.SilkRopeCoil || item.type == ItemID.VineRopeCoil || item.type == ItemID.WebRopeCoil)) ||

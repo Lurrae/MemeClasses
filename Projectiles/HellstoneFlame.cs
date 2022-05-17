@@ -1,6 +1,8 @@
 using MemeClasses.Items.Pulleys;
 using Microsoft.Xna.Framework;
+using System;
 using Terraria;
+using Terraria.Audio;
 using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
@@ -17,8 +19,8 @@ namespace MemeClasses.Projectiles
 
 		public override void SetDefaults()
 		{
-			Projectile.width = 6;
-			Projectile.height = 6;
+			Projectile.width = 16;
+			Projectile.height = 16;
 			Projectile.friendly = true;
 			Projectile.penetrate = -1;
 			Projectile.DamageType = GetInstance<PulleyDamageClass>();
@@ -29,6 +31,8 @@ namespace MemeClasses.Projectiles
 		public override void AI()
 		{
 			Animate();
+			Player player = Main.player[Projectile.owner];
+			PulleyPlayer pPlr = player.GetModPlayer<PulleyPlayer>();
 
 			NPC target = Projectile.FindTargetWithinRange(800f, true);
 			if (target != null)
@@ -37,12 +41,13 @@ namespace MemeClasses.Projectiles
 
 				if (ShotCooldown == 0)
 				{
-					ShotCooldown = 60;
+					ShotCooldown = (int)Math.Max(30, 90 - (2 * pPlr.PulleySpeed));
 					Vector2 targetPos = target.Center;
 					Vector2 velocity = targetPos - Projectile.Center;
 					velocity.Normalize();
 
-					Projectile.NewProjectile(Projectile.GetSource_FromAI(), Projectile.Center, velocity * 5f, ProjectileType<HellstoneFlameShot>(), Projectile.damage, Projectile.knockBack, Projectile.owner);
+					SoundEngine.PlaySound(SoundID.Item42, Projectile.Center);
+					Projectile.NewProjectile(Projectile.GetSource_FromAI(), Projectile.Center, velocity * 12f, ProjectileType<HellstoneFlameShot>(), Projectile.damage, Projectile.knockBack, Projectile.owner);
 				}
 			}
 		}
@@ -71,10 +76,9 @@ namespace MemeClasses.Projectiles
 	{
 		public override void SetDefaults()
 		{
-			Projectile.width = 6;
-			Projectile.height = 6;
+			Projectile.width = 20;
+			Projectile.height = 20;
 			Projectile.friendly = true;
-			Projectile.penetrate = -1;
 			Projectile.DamageType = GetInstance<PulleyDamageClass>();
 		}
 

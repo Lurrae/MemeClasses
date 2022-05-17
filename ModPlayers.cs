@@ -22,6 +22,9 @@ namespace MemeClasses
 		public Item ActivePulley; // What pulley item is in the player's pulley slot?
 		public float MechPulleyCharge;
 		public bool JustLeftRope;
+		public bool MovingOnZipline;
+		public bool MovingHorizontallyOnVanillaRope;
+		public bool Rotor;
 
 		public override void ResetEffects()
 		{
@@ -30,6 +33,7 @@ namespace MemeClasses
 			RopeGlove = false;
 			RopeGlove2 = false;
 			ActivePulley = null;
+			Rotor = false;
 		}
 
 		public override void UpdateEquips()
@@ -52,14 +56,31 @@ namespace MemeClasses
 			}
 		}
 
+		public override void PreUpdateMovement()
+		{
+			if (Player.pulley)
+			{
+				Player.instantMovementAccumulatedThisFrame.X *= PulleySpeed;
+				Player.velocity *= PulleySpeed;
+				Player.maxFallSpeed *= PulleySpeed;
+
+				if (Player.instantMovementAccumulatedThisFrame.X != 0)
+				{
+					MovingHorizontallyOnVanillaRope = true;
+				}
+				else
+				{
+					MovingHorizontallyOnVanillaRope = false;
+				}
+			}
+		}
+
 		private int timer = 0;
+		private int moveTimer = 0;
 		public override void PostUpdateMiscEffects()
 		{
 			if (Player.pulley)
 			{
-				Player.velocity *= PulleySpeed;
-				Player.maxFallSpeed *= PulleySpeed;
-
 				// Handle all custom pulleys' behaviors
 				if (ActivePulley != null)
 				{
@@ -67,25 +88,82 @@ namespace MemeClasses
 					{
 						SlimePulley_DownwardMovement();
 					}
-					if (Player.velocity != Vector2.Zero)
+					else if (ActivePulley.type == ItemType<MechPulley>() && MechPulleyCharge >= 3f)
 					{
+						MechPulley_MaxCharge();
+					}
+					else if (ActivePulley.type == ItemType<RopeEater>())
+					{
+						float range = 196 * PulleySpeed;
+
+						for (int i = 0; i < 10; i++)
+						{
+							Dust dust = Dust.NewDustDirect(Player.Center, 1, 1, DustID.JungleGrass);
+							dust.position += Main.rand.NextVector2CircularEdge(range, range);
+							dust.noGravity = true;
+						}
+
+						if (Player.ownedProjectileCounts[ProjectileType<RopeEaterMinion>()] < 2)
+						{
+							RopeEater_ManEaters();
+						}
+					}
+					else if (ActivePulley.type == ItemType<ShroomPulley>())
+					{
+						float range = 196 * PulleySpeed;
+
+						for (int i = 0; i < 10; i++)
+						{
+							Dust dust = Dust.NewDustDirect(Player.Center, 1, 1, DustID.GlowingMushroom);
+							dust.position += Main.rand.NextVector2CircularEdge(range, range);
+							dust.noGravity = true;
+						}
+
 						timer++;
+						if (timer >= 15 && Player.ownedProjectileCounts[ProjectileID.TruffleSpore] < 40)
+						{
+							ShroomPulley_Spores();
+							timer = 0;
+						}
+					}
+
+					if (Player.velocity != Vector2.Zero || MovingHorizontallyOnVanillaRope || MovingOnZipline)
+					{
+						moveTimer++;
 
 						if (ActivePulley.type == ItemType<MechPulley>())
 						{
 							MechPulley_BuildUpCharge();
 						}
-						else if (ActivePulley.type == ItemType<HellstonePulley>() && timer == 10)
+						else if (ActivePulley.type == ItemType<HellstonePulley>() && moveTimer >= Math.Max(16 - (2 * PulleySpeed), 3))
 						{
 							HellstonePulley_LingeringFlames();
-							timer = 0;
+							moveTimer = 0;
 						}
+						else if (ActivePulley.type == ItemType<WoodenPulley>() && moveTimer >= Math.Max(15 - (0.05f * Player.velocity.Length()), 3))
+						{
+							WoodPulley_Projectiles();
+							moveTimer = 0;
+						}
+						else if (ActivePulley.type == ItemType<FancyPulley>() && moveTimer >= Math.Max(12 - (0.1f * Player.velocity.Length()), 3))
+						{
+							FancyPulley_BloodGlobs();
+							moveTimer = 0;
+						}
+					}
+
+					if (ActivePulley.type != ItemType<MechPulley>() && MechPulleyCharge >= 1f)
+					{
+						MechPulley_SummonBolts();
 					}
 				}
 			}
-			else if (JustLeftRope && ActivePulley.type == ItemType<MechPulley>())
+			else if (JustLeftRope && ActivePulley != null)
 			{
-				MechPulley_SummonBolts();
+				if (ActivePulley.type == ItemType<MechPulley>())
+				{
+					MechPulley_SummonBolts();
+				}
 			}
 
 			JustLeftRope = Player.pulley;
@@ -103,7 +181,7 @@ namespace MemeClasses
 
 				// Afterimage effect + damage enemies
 				Player.armorEffectDrawShadow = true;
-				Player.CollideWithNPCs(Player.getRect(), ActivePulley.damage, ActivePulley.knockBack, 10, 10);
+				Player.CollideWithNPCs(Player.getRect(), ActivePulley.damage * (0.05f * Player.velocity.Y), ActivePulley.knockBack, 10, 10);
 			}
 		}
 
@@ -125,69 +203,156 @@ namespace MemeClasses
 					soundsPlayed++;
 				}
 			}
-			else
+		}
+
+		private void MechPulley_MaxCharge()
+		{
+			float x = Main.rand.NextFloat(-0.2f, 0.2f);
+			float y = Main.rand.NextFloat(-0.2f, 0.2f);
+
+			Dust dust = Dust.NewDustDirect(Player.position, Player.width, Player.height, DustID.CosmicCarKeys, x, y);
+			dust.noGravity = true;
+
+			foreach (NPC npc in Main.npc)
 			{
-				MechPulley_SummonBolts();
+				// Only release charge if there's an enemy in range
+				if (npc.CanBeChasedBy() && Player.Distance(npc.Center) <= 512f)
+				{
+					MechPulley_SummonBolts();
+					break;
+				}
 			}
 		}
 
 		private readonly List<int> targets = new();
 		private void MechPulley_SummonBolts()
 		{
-			SoundEngine.PlaySound(SoundID.Item94, Player.Center);
+			int charge = (int)Math.Floor(MechPulleyCharge);
 			
-			int charge = (int)Math.Round(MechPulleyCharge);
-			foreach (NPC npc in Main.npc)
-			{
-				if (!npc.CanBeChasedBy() || Player.Distance(npc.Center) > 512f)
-				{
-					continue; // Skip any NPCs we can't target
-				}
-
-				targets.Add(npc.whoAmI);
-				if (targets.Count == 3)
-					break;
-			}
-
 			if (charge > 0)
 			{
+				SoundEngine.PlaySound(SoundID.Item94, Player.Center);
+
+				for (int n = 0; n < Main.maxNPCs; n++)
+				{
+					NPC npc = Main.npc[n];
+
+					if (!npc.CanBeChasedBy() || Player.Distance(npc.Center) > 512f)
+					{
+						continue; // Skip any NPCs we can't target
+					}
+
+					targets.Add(npc.whoAmI);
+					if (targets.Count == 3)
+						break;
+				}
+
 				for (int i = 0; i < charge; i++)
 				{
-					var source = Player.GetSource_ItemUse(ActivePulley);
-					float damage = ActivePulley.damage * MechPulleyCharge;
-					Projectile bolt = Projectile.NewProjectileDirect(source, Player.Center, Vector2.One * 5f, ProjectileID.MagnetSphereBolt, (int)damage, ActivePulley.knockBack, Player.whoAmI);
-					bolt.DamageType = GetInstance<PulleyDamageClass>();
-					
-					if (targets.Count > i)
+					var source = Player.GetSource_ItemUse(ActivePulley, "MechPulley_Bolt");
+					Vector2 newVel;
+
+					if (targets.Count > 0)
 					{
-						Vector2 targetPos = Main.npc[targets[i]].Center;
-						Vector2 newVel = targetPos - Player.Center;
+						Vector2 targetPos;
+
+						if (targets.Count < i + 1)
+						{
+							int j = Main.rand.Next(targets.Count);
+							targetPos = Main.npc[targets[j]].Center;
+						}
+						else
+						{
+							targetPos = Main.npc[targets[i]].Center;
+						}
+
+						newVel = targetPos - Player.Center;
 						newVel.Normalize();
-						bolt.velocity = newVel * 5f;
 					}
 					else
 					{
-						bolt.velocity = bolt.velocity.RotatedByRandom(MathHelper.ToRadians(360f));
+						newVel = Vector2.One.RotatedByRandom(MathHelper.ToRadians(360f));
 					}
+
+					Projectile bolt = Projectile.NewProjectileDirect(source, Player.Center, newVel * 5f, ProjectileID.MagnetSphereBolt, ActivePulley.damage, ActivePulley.knockBack, Player.whoAmI);
+					bolt.DamageType = GetInstance<PulleyDamageClass>();
+					bolt.maxPenetrate = bolt.penetrate = charge; // Hits one enemy per charge
+					bolt.ArmorPenetration = 10; // Ignores 10 enemy defense
 				}
 			}
-			MechPulleyCharge = 0f;
-			soundsPlayed = 0;
+			if (Rotor && charge > 1)
+			{
+				MechPulleyCharge = 1f;
+				soundsPlayed = 1;
+			}
+			else
+			{
+				MechPulleyCharge = 0f;
+				soundsPlayed = 0;
+			}
 			targets.Clear();
 		}
 
 		private void HellstonePulley_LingeringFlames()
 		{
-			int pulleyDir = Player.pulleyDir;
-			float gravDir = Player.gravDir;
-			int dir = Player.direction;
-
-			int num = (pulleyDir == 2) ? 0 : 10;
-			int num2 = (pulleyDir == 2) ? -25 : -26;
 			Vector2 vector = new(Player.width / 2, Player.height / 2);
-			Vector2 vector2 = new((int)(Player.position.X + vector.X - (9 * dir)) + num * dir, (int)(Player.position.Y + vector.Y + 2f * gravDir + num2 * gravDir));
+			Vector2 vector2 = new((int)(Player.position.X + vector.X - 9) + 10, (int)(Player.position.Y + vector.Y + 2f * Player.gravDir + -26 * Player.gravDir));
 
 			Projectile.NewProjectile(Player.GetSource_ItemUse(ActivePulley), vector2, Vector2.Zero, ProjectileType<HellstoneFlame>(), ActivePulley.damage, ActivePulley.knockBack, Player.whoAmI);
+		}
+
+		private void WoodPulley_Projectiles()
+		{
+			Vector2 velocity = Vector2.UnitY;
+			velocity = velocity.RotatedByRandom(MathHelper.ToRadians(45f));
+			if (Player.velocity.Y < 0)
+				velocity.Y *= 6f;
+
+			int type;
+			int damageMod;
+			if (Main.rand.NextBool(3)) // 1/3 chance to shoot a splinter
+			{
+				type = ProjectileType<Splinter>();
+				damageMod = 2;
+				velocity.X *= 8;
+				velocity.Y *= -4; // Multiply by a negative number to make it shoot upwards
+			}
+			else // 2/3 chance to shoot a rope shred
+			{
+				type = ProjectileType<RopeShred>();
+				damageMod = 1;
+				velocity.X *= 4;
+				velocity.Y *= -3;
+			}
+
+			Projectile proj = Projectile.NewProjectileDirect(Player.GetSource_ItemUse(ActivePulley), Player.Center, velocity, type, ActivePulley.damage * damageMod, ActivePulley.knockBack * damageMod, Player.whoAmI);
+			proj.friendly = true;
+			proj.hostile = false;
+			proj.DamageType = GetInstance<PulleyDamageClass>();
+		}
+
+		private void FancyPulley_BloodGlobs()
+		{
+			Vector2 velocity = Vector2.UnitY;
+			velocity = velocity.RotatedByRandom(MathHelper.ToRadians(45f));
+			if (Player.velocity.Y < 0)
+				velocity.Y *= 5f;
+
+			Projectile proj = Projectile.NewProjectileDirect(Player.GetSource_ItemUse(ActivePulley), Player.Center, velocity * -3.5f, ProjectileType<BloodGlob>(), ActivePulley.damage, ActivePulley.knockBack, Player.whoAmI, 3);
+			proj.DamageType = GetInstance<PulleyDamageClass>();
+		}
+
+		private void RopeEater_ManEaters()
+		{
+			Projectile.NewProjectile(Player.GetSource_ItemUse(ActivePulley), Player.Center, Vector2.Zero, ProjectileType<RopeEaterMinion>(), ActivePulley.damage, ActivePulley.knockBack, Player.whoAmI, Player.ownedProjectileCounts[ProjectileType<RopeEaterMinion>()]);
+		}
+
+		private void ShroomPulley_Spores()
+		{
+			float range = 198 * PulleySpeed;
+			Vector2 spawnPos = Player.Center + Main.rand.NextVector2Circular(range, range);
+
+			Projectile.NewProjectile(Player.GetSource_ItemUse(ActivePulley, "ShroomPulley_Spore"), spawnPos, Vector2.Zero, ProjectileID.TruffleSpore, ActivePulley.damage, ActivePulley.knockBack, Player.whoAmI);
 		}
 	}
 }

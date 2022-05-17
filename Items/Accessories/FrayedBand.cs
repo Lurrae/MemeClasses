@@ -1,12 +1,14 @@
+using MemeClasses.Items.Pulleys;
 using Terraria;
 using Terraria.ID;
 using Terraria.GameContent.Creative;
 using Terraria.ModLoader;
+using static Terraria.ModLoader.ModContent;
 
 namespace MemeClasses.Items.Accessories
 {
 	[AutoloadEquip(EquipType.HandsOn)]
-	public class RopeGlove : ModItem
+	public class FrayedBand : ModItem
 	{
 		public override void SetStaticDefaults()
 		{
@@ -17,22 +19,19 @@ namespace MemeClasses.Items.Accessories
 		{
 			Item.accessory = true;
 			Item.rare = ItemRarityID.Blue;
-			Item.value = Item.sellPrice(silver: 2);
+			Item.value = Item.sellPrice(copper: 85);
 		}
 
 		public override void UpdateEquip(Player player)
 		{
-			PulleyPlayer pPlr = player.GetModPlayer<PulleyPlayer>();
-
-			pPlr.PulleySpeed += 0.05f; // +5% pulley speed
-			pPlr.BonusRopeRange += 1; // +1 rope placement range
-			pPlr.RopeGlove = true; // Increased rope grab range
+			player.GetDamage(GetInstance<PulleyDamageClass>()).Flat += 2; // +2 damage
+			player.GetCritChance(GetInstance<PulleyDamageClass>()) += 2f; // +2% crit chance
 		}
 
 		public override void AddRecipes()
 		{
 			CreateRecipe()
-				.AddRecipeGroup("MemeClasses:Ropes", 25)
+				.AddRecipeGroup("MemeClasses:Ropes", 5)
 				.AddTile(TileID.Loom)
 				.Register();
 		}
