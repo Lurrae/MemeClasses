@@ -17,8 +17,8 @@ namespace MemeClasses.Projectiles
 	{
 		public override void SetDefaults()
 		{
-			Projectile.width = 14;
-			Projectile.height = 28;
+			Projectile.width = 16;
+			Projectile.height = 26;
 			Projectile.timeLeft = Projectile.SentryLifeTime;
 		}
 
