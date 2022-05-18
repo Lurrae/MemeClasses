@@ -21,6 +21,11 @@ namespace MemeClasses
 			{
 				npcLoot.Add(ItemDropRule.Common(ItemType<FancyPulley>())); // Guaranteed drop since The Groom is pretty rare
 			}
+
+			if (npc.type == NPCID.SporeSkeleton)
+			{
+				npcLoot.Add(ItemDropRule.Common(ItemType<ShroomPulley>(), 50)); // 1/50 drop chance
+			}
 		}
 
 		public override void SetupShop(int type, Chest shop, ref int nextSlot)

@@ -14,12 +14,13 @@ Mods:
 			# Tools
 			IceCoil: "Ice Coil"
 			RopeGun: "Rope Cannon"
-			ZiplineShooter: "Zipline Gun [ PROTOTYPE ]"
+			SkeletonZipline: "Skeletal Zipline [ PROTOTYPE ]"
 			
 			# Pullies
 			FancyPulley: "Fancy Pulley"
 			HellstonePulley: "Hellstone Pulley"
 			MechPulley: "Mechanical Pulley"
+			MistPulley: "Mist Pulley"
 			RopeEater: "Rope Eater's Maw"
 			ShroomPulley: "Shroom Pulley"
 			SlimePulley: "Slimy Pulley"
@@ -63,30 +64,33 @@ Mods:
 				The icy rope coil can be placed in midair
 				'''
 			RopeGun: "Fires Rope Coils at a much higher speed than normal"
-			ZiplineShooter:
+			SkeletonZipline:
 				'''
 				[ PROTOTYPE - This item may not behave as intended and uses placeholder graphics! ]
-				Left-click and right-click each place a tether
-				When two tethers are active at the same time, they connect together and can support pullies!
+				Left-click or right-click to raise an undead hand from the ground
+				When two undead hands are active and have line of sight, a rope forms between them!
+				If the hands do not have line of sight, an X will appear at the first tile blocking them
 				'''
 			
 			# Pullies
 			FancyPulley:
 				'''
-				Releases bouncing globs of blood while moving on the pulley
+				Releases bouncing globs of blood while moving on a rope
 				More blood is fired the faster you're moving
 				'''
 			HellstonePulley:
 				'''
-				Lights ropes on fire while moving on the pulley
+				Lights ropes on fire while moving on a rope
 				The flames spit fireballs at nearby enemies, with the fire rate increasing with pulley speed
 				'''
 			MechPulley:
 				'''
 				'Watch your hands!'
-				Builds up an electrical charge while moving on the pulley
+				Builds up an electrical charge while moving on a rope
 				When you dismount from a rope, the pulley releases up to 3 electrical bolts at nearby enemies
+				Ignores 10 enemy defense
 				'''
+			MistPulley: "Generates icy-cold mist while moving on a rope"
 			RopeEater:
 				'''
 				'Not to be confused with a Man Eater's maw'
@@ -95,19 +99,19 @@ Mods:
 				'''
 			ShroomPulley:
 				'''
-				Summons spores around you while on the pulley
+				Summons spores around you while climbing a rope
 				The spores will linger around until they hit an enemy or enough time has passed
 				'''
 			SlimePulley:
 				'''
-				Provides knockback immunity while clinging to a rope
+				Provides knockback immunity while climbing a rope
 				You travel much faster when moving down a rope and can damage enemies on collision
 				Deals more damage the faster you're moving
 				'''
 			WoodenPulley:
 				'''
 				'Might not be the most practical...'
-				Releases shreds of rope while moving on the pulley
+				Releases shreds of rope while moving on a rope
 				Sometimes releases a splinter that does more damage and moves quicker
 				Projectiles are spawned faster when moving faster
 				'''

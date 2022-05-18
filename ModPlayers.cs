@@ -21,7 +21,10 @@ namespace MemeClasses
 		public bool RopeGlove2; // Magnetism effect, but stronger
 		public Item ActivePulley; // What pulley item is in the player's pulley slot?
 		public float MechPulleyCharge;
+		public int MaxCharges;
+		public int ChargesToRetain;
 		public bool JustLeftRope;
+		public bool OnZipline;
 		public bool MovingOnZipline;
 		public bool MovingHorizontallyOnVanillaRope;
 		public bool Rotor;
@@ -30,6 +33,8 @@ namespace MemeClasses
 		{
 			PulleySpeed = 1f;
 			BonusRopeRange = 0;
+			MaxCharges = 3;
+			ChargesToRetain = 1;
 			RopeGlove = false;
 			RopeGlove2 = false;
 			ActivePulley = null;
@@ -44,6 +49,21 @@ namespace MemeClasses
 				{
 					item.tileBoost = 3 + BonusRopeRange; // We can't do += here because tileBoost does not reset every frame, so it would just increase infinitely
 				}
+			}
+		}
+
+		public override void PostUpdate()
+		{
+			bool movingDown = Player.velocity.Y > 0 || (MovingOnZipline && Player.controlDown);
+
+			if (OnZipline)
+			{
+				Player.pulley = true;
+			}
+			
+			if (Player.pulley && ActivePulley != null && ActivePulley.type == ItemType<SlimePulley>() && movingDown)
+			{
+				Player.armorEffectDrawShadow = true;
 			}
 		}
 
@@ -88,7 +108,7 @@ namespace MemeClasses
 					{
 						SlimePulley_DownwardMovement();
 					}
-					else if (ActivePulley.type == ItemType<MechPulley>() && MechPulleyCharge >= 3f)
+					else if (ActivePulley.type == ItemType<MechPulley>() && MechPulleyCharge >= MaxCharges)
 					{
 						MechPulley_MaxCharge();
 					}
@@ -175,33 +195,40 @@ namespace MemeClasses
 
 			if (Player.velocity.Y > 0 && Player.controlDown) // Moving downwards
 			{
-				// Double downwards speed
+				// Player moves downwards faster
 				Player.velocity *= 1.2f;
-				Player.maxFallSpeed *= 2f;
+				Player.maxFallSpeed *= 1.6f;
 
-				// Afterimage effect + damage enemies
-				Player.armorEffectDrawShadow = true;
-				Player.CollideWithNPCs(Player.getRect(), ActivePulley.damage * (0.05f * Player.velocity.Y), ActivePulley.knockBack, 10, 10);
+				// Damage enemies
+				int collisions = Player.CollideWithNPCs(Player.getRect(), ActivePulley.damage + Player.velocity.Y, ActivePulley.knockBack, 20, 6);
+				if (collisions > 0)
+				{
+					Player.velocity.Y = -16;
+				}
 			}
 		}
 
 		private int soundsPlayed = 0;
 		private void MechPulley_BuildUpCharge()
 		{
-			if (MechPulleyCharge < 3f)
+			if (MechPulleyCharge < MaxCharges)
 			{
-				MechPulleyCharge += 0.01f * (Player.position.Distance(Player.oldPosition) / 4);
+				MechPulleyCharge += 0.01f + (0.01f * (Player.position.Distance(Player.oldPosition) / 4));
 				MechPulleyCharge = (float)Math.Round(MechPulleyCharge, 2);
 
-				if ((MechPulleyCharge >= 1f && soundsPlayed < 1) || (MechPulleyCharge >= 2f && soundsPlayed < 2) || (MechPulleyCharge >= 3f && soundsPlayed < 3))
+				for (int i = 1; i < MaxCharges + 1; i++)
 				{
-					SoundEngine.PlaySound(SoundID.MaxMana, Player.Center);
-					for (int i = 0; i < 10; i++)
+					if (MechPulleyCharge >= i && soundsPlayed < i)
 					{
-						Dust.NewDust(Player.position, Player.width, Player.height, DustID.Electric, Main.rand.Next(-5, 5), Main.rand.Next(-5, -3));
+						SoundEngine.PlaySound(SoundID.MaxMana, Player.Center);
+						for (int j = 0; j < 10; j++)
+						{
+							Dust.NewDust(Player.position, Player.width, Player.height, DustID.Electric, Main.rand.Next(-5, 5), Main.rand.Next(-5, -3));
+						}
+						soundsPlayed++;
 					}
-					soundsPlayed++;
 				}
+				
 			}
 		}
 
@@ -280,10 +307,10 @@ namespace MemeClasses
 					bolt.ArmorPenetration = 10; // Ignores 10 enemy defense
 				}
 			}
-			if (Rotor && charge > 1)
+			if (Rotor && charge > ChargesToRetain)
 			{
-				MechPulleyCharge = 1f;
-				soundsPlayed = 1;
+				MechPulleyCharge = ChargesToRetain;
+				soundsPlayed = ChargesToRetain;
 			}
 			else
 			{
