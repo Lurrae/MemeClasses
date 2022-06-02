@@ -170,6 +170,11 @@ namespace MemeClasses
 							FancyPulley_BloodGlobs();
 							moveTimer = 0;
 						}
+						else if (ActivePulley.type == ItemType<MistPulley>() && moveTimer >= 10) // This one does not scale with velocity/pulley speed
+						{
+							MistPulley_MistClouds();
+							moveTimer = 0;
+						}
 					}
 
 					if (ActivePulley.type != ItemType<MechPulley>() && MechPulleyCharge >= 1f)
@@ -380,6 +385,14 @@ namespace MemeClasses
 			Vector2 spawnPos = Player.Center + Main.rand.NextVector2Circular(range, range);
 
 			Projectile.NewProjectile(Player.GetSource_ItemUse(ActivePulley, "ShroomPulley_Spore"), spawnPos, Vector2.Zero, ProjectileID.TruffleSpore, ActivePulley.damage, ActivePulley.knockBack, Player.whoAmI);
+		}
+
+		private void MistPulley_MistClouds()
+		{
+			var source = Player.GetSource_ItemUse(ActivePulley, "MistPulley_Mist");
+
+			Projectile proj = Projectile.NewProjectileDirect(source, Player.Center, Vector2.Zero, ProjectileID.SporeCloud, ActivePulley.damage, ActivePulley.knockBack, Player.whoAmI);
+			proj.scale = Player.velocity.Length() * 0.3f; // Projectiles are larger when the player is moving faster
 		}
 	}
 }
